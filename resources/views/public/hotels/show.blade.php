@@ -337,7 +337,7 @@
 @push('scripts')
 <script>
     // ── WebSocket — disponibilidade em tempo real ────────────────────
-    const hotelId = {{ $hotel->id }};
+    const hotelId = @json($hotel->id);
 
     // Só conecta se o Echo estiver disponível (Reverb configurado)
     if (typeof window.Echo !== 'undefined') {
