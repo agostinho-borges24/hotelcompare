@@ -17,6 +17,12 @@ class HomeController extends Controller
             ->take(6)
             ->get();
 
+        $latestHotels = Hotel::active()
+            ->with(['amenities', 'images'])
+            ->orderByDesc('created_at')
+            ->take(8)
+            ->get();
+
         $topRatedHotels = Hotel::active()
             ->with(['images'])
             ->where('total_reviews', '>', 0)
@@ -29,6 +35,7 @@ class HomeController extends Controller
 
         return view('public.home', compact(
             'featuredHotels',
+            'latestHotels',
             'topRatedHotels',
             'totalHotels',
             'totalReviews'
