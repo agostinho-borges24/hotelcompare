@@ -77,11 +77,11 @@ Route::middleware(['auth', 'verified', 'role:admin'])
         Route::get('/dashboard',          [AdminDashboard::class, 'index'])->name('dashboard');
 
         // Gestão de hotéis
-        Route::resource('hoteis', AdminHotelController::class);
+        Route::resource('hoteis', AdminHotelController::class)->parameters(['hoteis' => 'hotel']);
         Route::patch('/hoteis/{hotel}/status', [AdminHotelController::class, 'updateStatus'])->name('hotels.status');
 
         // Gestão de utilizadores
-        Route::resource('utilizadores', AdminUserController::class)->except(['create', 'store']);
+        Route::resource('utilizadores', AdminUserController::class)->except(['create', 'store'])->parameters(['utilizadores' => 'utilizador']);
         Route::patch('/utilizadores/{user}/toggle', [AdminUserController::class, 'toggleActive'])->name('users.toggle');
 
         // Moderação de avaliações
