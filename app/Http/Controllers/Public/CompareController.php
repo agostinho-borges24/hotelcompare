@@ -3,39 +3,45 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\Amenity;
 use App\Models\Hotel;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class CompareController extends Controller
 {
-    public function index(Request $request): View
+    const MAX_COMPARE = 3;
+
+    public function index(Request $request)
     {
-        $ids = collect(explode(',', (string) $request->input('ids', '')))
-            ->filter()
-            ->map(fn ($id) => (int) $id)
-            ->unique()
-            ->take(4) // máximo de 4 hotéis em comparação
-            ->values();
+        $ids = array_filter(explode(',', $request->get('ids', '')));
 
-        $hotels = Hotel::active()
-            ->whereIn('id', $ids)
-            ->with(['amenities', 'rooms', 'images'])
-            ->get()
-            ->sortBy(fn ($hotel) => $ids->search($hotel->id))
-            ->values();
+        // Suporta também ids[] vindos do formulário
+        if (empty($ids) && $request->filled('ids')) {
+            $ids = (array) $request->ids;
+        }
 
-        // Lista de todas as comodidades para a tabela comparativa
-        $allAmenities = $hotels->pluck('amenities')->flatten()->unique('id')->sortBy('name');
+        $ids = array_slice(array_filter($ids), 0, self::MAX_COMPARE);
 
-        // Hotéis sugeridos para adicionar à comparação
-        $suggestions = Hotel::active()
-            ->whereNotIn('id', $ids)
-            ->with('images')
-            ->orderByDesc('avg_rating')
-            ->take(6)
+        $hotels = collect();
+
+        if (!empty($ids)) {
+            $hotels = Hotel::active()
+                ->whereIn('id', $ids)
+                ->with(['amenities', 'rooms', 'approvedReviews'])
+                ->get();
+        }
+
+        $allAmenities = Amenity::orderBy('category')->orderBy('name')->get();
+
+        $availableHotels = Hotel::active()
+            ->select('id', 'name', 'slug', 'stars', 'price_per_night')
+            ->orderBy('name')
             ->get();
 
-        return view('public.hotels.compare', compact('hotels', 'allAmenities', 'suggestions'));
+        return view('public.hotels.compare', compact(
+            'hotels',
+            'allAmenities',
+            'availableHotels',
+        ));
     }
 }
