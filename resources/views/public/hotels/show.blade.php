@@ -336,20 +336,20 @@
 
 @push('scripts')
 <script>
-    // ── WebSocket — disponibilidade em tempo real ────────────────────
-    const hotelId = @json($hotel->id);
+    function initEcho() {
+        const hotelId = @json($hotel->id);
 
-    // Só conecta se o Echo estiver disponível (Reverb configurado)
-    if (typeof window.Echo !== 'undefined') {
         window.Echo.channel(`hotel.${hotelId}`)
             .listen('.room.availability', (data) => {
+                console.log('✅ Evento recebido:', data);
+
                 const badge = document.getElementById(`badge-${data.room_id}`);
                 const units = document.getElementById(`units-${data.room_id}`);
                 const card  = document.querySelector(`#room-${data.room_id} > div`);
 
                 if (badge) {
-                    badge.textContent    = data.is_available ? 'Disponível' : 'Esgotado';
-                    badge.className      = `availability-badge ${data.is_available
+                    badge.textContent = data.is_available ? 'Disponível' : 'Esgotado';
+                    badge.className   = `availability-badge ${data.is_available
                         ? 'bg-success-subtle text-success border border-success-subtle'
                         : 'bg-danger-subtle text-danger border border-danger-subtle'}`;
                 }
@@ -361,5 +361,18 @@
                 }
             });
     }
+
+    // Espera que o Echo esteja disponível (carregado pelo app.js)
+    function waitForEcho(attempts = 0) {
+        if (typeof window.Echo !== 'undefined') {
+            initEcho();
+        } else if (attempts < 20) {
+            setTimeout(() => waitForEcho(attempts + 1), 200);
+        } else {
+            console.error('❌ Echo não carregou após 4 segundos.');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => waitForEcho());
 </script>
 @endpush
