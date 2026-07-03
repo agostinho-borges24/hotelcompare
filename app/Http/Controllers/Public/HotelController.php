@@ -6,91 +6,70 @@ use App\Http\Controllers\Controller;
 use App\Models\Amenity;
 use App\Models\Hotel;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class HotelController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request)
     {
-        $query = Hotel::active()->with(['images', 'amenities']);
+        $query = Hotel::active()->with(['amenities', 'images']);
 
-        // ── Filtros ──────────────────────────────────────────────
-        if ($request->filled('search')) {
-            $search = $request->string('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('neighborhood', 'like', "%{$search}%")
-                  ->orWhere('address', 'like', "%{$search}%");
+        if ($request->filled('q')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->q . '%')
+                    ->orWhere('address', 'like', '%' . $request->q . '%')
+                    ->orWhere('neighborhood', 'like', '%' . $request->q . '%');
             });
         }
 
         if ($request->filled('stars')) {
-            $query->whereIn('stars', (array) $request->input('stars'));
+            $query->byStars((int) $request->stars);
         }
 
-        if ($request->filled('price_min')) {
-            $query->where('price_per_night', '>=', $request->float('price_min'));
-        }
-
-        if ($request->filled('price_max')) {
-            $query->where('price_per_night', '<=', $request->float('price_max'));
+        if ($request->filled('max_price')) {
+            $query->byMaxPrice((float) $request->max_price);
         }
 
         if ($request->filled('amenities')) {
-            $amenityIds = (array) $request->input('amenities');
-            $query->whereHas('amenities', function ($q) use ($amenityIds) {
-                $q->whereIn('amenities.id', $amenityIds);
-            }, '=', count($amenityIds));
+            $ids = (array) $request->amenities;
+            $query->whereHas('amenities', function ($q) use ($ids) {
+                $q->whereIn('amenities.id', $ids);
+            }, '>=', count($ids));
         }
 
-        if ($request->filled('neighborhood')) {
-            $query->where('neighborhood', $request->string('neighborhood'));
-        }
-
-        // ── Ordenação ────────────────────────────────────────────
-        $sort = $request->input('sort', 'recommended');
-        match($sort) {
-            'price_asc'  => $query->orderBy('price_per_night', 'asc'),
-            'price_desc' => $query->orderBy('price_per_night', 'desc'),
-            'rating'     => $query->orderByDesc('avg_rating'),
-            'stars'      => $query->orderByDesc('stars'),
-            default      => $query->orderByDesc('is_featured')->orderByDesc('avg_rating'),
+        $sort = $request->get('sort', 'rating');
+        match ($sort) {
+            'price_asc'  => $query->orderBy('price_per_night'),
+            'price_desc' => $query->orderByDesc('price_per_night'),
+            'newest'     => $query->orderByDesc('created_at'),
+            default      => $query->orderByDesc('avg_rating'),
         };
 
-        $hotels = $query->paginate(12)->withQueryString();
+        $hotels    = $query->paginate(12)->withQueryString();
+        $amenities = Amenity::all()->groupBy('category');
 
-        $amenities = Amenity::orderBy('category')->orderBy('name')->get()->groupBy('category');
-
-        $neighborhoods = Hotel::active()
-            ->whereNotNull('neighborhood')
-            ->distinct()
-            ->pluck('neighborhood');
-
-        return view('public.hotels.index', compact('hotels', 'amenities', 'neighborhoods'));
+        return view('public.hotels.index', compact('hotels', 'amenities'));
     }
 
-    public function show(string $slug): View
+    public function show(string $slug)
     {
         $hotel = Hotel::active()
             ->where('slug', $slug)
             ->with([
-                'images',
                 'amenities',
-                'rooms' => fn ($q) => $q->orderBy('price_per_night'),
+                'images',
+                'rooms',
                 'approvedReviews.user',
             ])
             ->firstOrFail();
 
-        $relatedHotels = Hotel::active()
+        $similar = Hotel::active()
             ->where('id', '!=', $hotel->id)
-            ->where('neighborhood', $hotel->neighborhood)
+            ->where('city', $hotel->city)
             ->with('images')
+            ->orderByDesc('avg_rating')
             ->take(4)
             ->get();
 
-        $userHasReviewed = auth()->check()
-            && $hotel->reviews()->where('user_id', auth()->id())->exists();
-
-        return view('public.hotels.show', compact('hotel', 'relatedHotels', 'userHasReviewed'));
+        return view('public.hotels.show', compact('hotel', 'similar'));
     }
 }
