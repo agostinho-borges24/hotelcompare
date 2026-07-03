@@ -13,13 +13,16 @@ class CompareController extends Controller
 
     public function index(Request $request)
     {
-        $ids = array_filter(explode(',', $request->get('ids', '')));
+        // ids pode vir como array (ids[]=1&ids[]=2) ou string (ids=1,2)
+        $raw = $request->get('ids', []);
 
-        // Suporta também ids[] vindos do formulário
-        if (empty($ids) && $request->filled('ids')) {
-            $ids = (array) $request->ids;
+        if (is_array($raw)) {
+            $ids = $raw;
+        } else {
+            $ids = explode(',', $raw);
         }
 
+        // Limpa valores vazios e limita a 3
         $ids = array_slice(array_filter($ids), 0, self::MAX_COMPARE);
 
         $hotels = collect();
