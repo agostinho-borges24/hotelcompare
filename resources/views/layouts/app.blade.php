@@ -54,6 +54,7 @@
         .flash-container { position: fixed; top: 70px; right: 16px; z-index: 9999; width: 340px; }
     </style>
 
+@vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
 <body>
@@ -215,7 +216,7 @@
     }, 5000);
 </script>
 
-@stack('scripts')
 @vite(['resources/js/app.js'])
+@stack('scripts')
 </body>
 </html>
