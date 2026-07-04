@@ -29,7 +29,12 @@ class HotelController extends Controller
 
     public function create()
     {
-        $managers  = User::where('role', 'hotel_manager')->where('is_active', true)->get();
+        // Apenas gestores sem hotel associado
+        $managers  = User::where('role', 'hotel_manager')
+            ->where('is_active', true)
+            ->whereDoesntHave('hotels')
+            ->get();
+
         $amenities = Amenity::all()->groupBy('category');
         return view('admin.hotels.create', compact('managers', 'amenities'));
     }
@@ -37,6 +42,14 @@ class HotelController extends Controller
     public function store(Request $request)
     {
         $validated = $this->validateHotel($request);
+
+        // Verifica se o gestor já tem um hotel
+        $manager = User::findOrFail($validated['user_id']);
+        if ($manager->hotels()->exists()) {
+            return back()
+                ->withInput()
+                ->withErrors(['user_id' => 'Este gestor já tem um hotel associado. Cada gestor só pode ter um hotel.']);
+        }
 
         $validated['slug'] = Str::slug($validated['name']) . '-' . Str::random(5);
 
@@ -63,7 +76,15 @@ class HotelController extends Controller
 
     public function edit(Hotel $hotel)
     {
-        $managers  = User::where('role', 'hotel_manager')->where('is_active', true)->get();
+        // Gestores sem hotel + o gestor actual do hotel
+        $managers = User::where('role', 'hotel_manager')
+            ->where('is_active', true)
+            ->where(function ($q) use ($hotel) {
+                $q->whereDoesntHave('hotels')
+                  ->orWhere('id', $hotel->user_id);
+            })
+            ->get();
+
         $amenities = Amenity::all()->groupBy('category');
         $hotel->load('amenities');
         return view('admin.hotels.edit', compact('hotel', 'managers', 'amenities'));
@@ -72,6 +93,16 @@ class HotelController extends Controller
     public function update(Request $request, Hotel $hotel)
     {
         $validated = $this->validateHotel($request, $hotel->id);
+
+        // Verifica se o novo gestor já tem outro hotel
+        if ($validated['user_id'] != $hotel->user_id) {
+            $manager = User::findOrFail($validated['user_id']);
+            if ($manager->hotels()->exists()) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['user_id' => 'Este gestor já tem um hotel associado. Cada gestor só pode ter um hotel.']);
+            }
+        }
 
         if ($request->hasFile('cover_image')) {
             $validated['cover_image'] = $request->file('cover_image')
@@ -90,9 +121,9 @@ class HotelController extends Controller
 
     public function destroy(Hotel $hotel)
     {
-        $hotel->delete();
+        $hotel->forceDelete();
         return redirect()->route('admin.hoteis.index')
-            ->with('success', 'Hotel removido.');
+            ->with('success', 'Hotel eliminado permanentemente.');
     }
 
     public function updateStatus(Request $request, Hotel $hotel)
