@@ -81,8 +81,8 @@ Route::middleware(['auth', 'verified', 'role:admin'])
         Route::patch('/hoteis/{hotel}/status', [AdminHotelController::class, 'updateStatus'])->name('hotels.status');
 
         // Gestão de utilizadores
-        Route::resource('utilizadores', AdminUserController::class)->except(['create', 'store'])->parameters(['utilizadores' => 'utilizador']);
-        Route::patch('/utilizadores/{user}/toggle', [AdminUserController::class, 'toggleActive'])->name('users.toggle');
+        Route::resource('utilizadores', AdminUserController::class)->parameters(['utilizadores' => 'utilizador']);
+        Route::patch('/utilizadores/{utilizador}/toggle', [AdminUserController::class, 'toggleActive'])->name('users.toggle');
 
         // Moderação de avaliações
         Route::get('/avaliacoes',         [AdminReviewController::class, 'index'])->name('reviews.index');
