@@ -23,8 +23,13 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary btn-sm w-100">Filtrar</button>
-                </div>
+    <button type="submit" class="btn btn-primary btn-sm w-100">Filtrar</button>
+</div>
+<div class="col-md-2">
+    <a href="{{ route('admin.utilizadores.create') }}" class="btn btn-outline-primary btn-sm w-100">
+        <i class="bi bi-person-plus me-1"></i>Novo
+    </a>
+</div>
             </div>
         </form>
     </div>
