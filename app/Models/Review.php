@@ -21,13 +21,16 @@ class Review extends Model
         'rating_value',
         'status',
         'stay_date',
+        'manager_reply',
+        'manager_replied_at',
     ];
 
     protected function casts(): array
     {
         return [
-            'stay_date' => 'datetime',
-            'rating'    => 'integer',
+            'stay_date'          => 'datetime',
+            'manager_replied_at' => 'datetime',
+            'rating'             => 'integer',
             'rating_cleanliness' => 'integer',
             'rating_service'     => 'integer',
             'rating_location'    => 'integer',
@@ -35,7 +38,6 @@ class Review extends Model
         ];
     }
 
-    // ─── Após guardar ou apagar, recalcula a média do hotel ─────────
     protected static function booted(): void
     {
         static::saved(function (Review $review) {
@@ -47,7 +49,6 @@ class Review extends Model
         });
     }
 
-    // ─── Scopes ─────────────────────────────────────────────────────
     public function scopeApproved($query)
     {
         return $query->where('status', 'approved');
@@ -58,10 +59,14 @@ class Review extends Model
         return $query->where('status', 'pending');
     }
 
-    // ─── Helpers ────────────────────────────────────────────────────
     public function isApproved(): bool
     {
         return $this->status === 'approved';
+    }
+
+    public function hasManagerReply(): bool
+    {
+        return !empty($this->manager_reply);
     }
 
     public function getStarsAttribute(): string
@@ -69,7 +74,6 @@ class Review extends Model
         return str_repeat('★', $this->rating) . str_repeat('☆', 5 - $this->rating);
     }
 
-    // ─── Relações ───────────────────────────────────────────────────
     public function hotel()
     {
         return $this->belongsTo(Hotel::class);
