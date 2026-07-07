@@ -77,7 +77,7 @@
                        href="{{ route('home') }}">Início</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('hotels.*') ? 'active' : '' }}"
+                    <a class="nav-link {{ request()->routeIs('hotels.index', 'hotels.show') ? 'active' : '' }}"
                        href="{{ route('hotels.index') }}">Hotéis</a>
                 </li>
                 <li class="nav-item">
