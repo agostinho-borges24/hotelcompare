@@ -9,7 +9,7 @@
 
         {{-- ── SIDEBAR DE FILTROS ── --}}
         <div class="col-lg-3">
-            <div class="card border-0 shadow-sm rounded-3 sticky-top" style="top:80px;">
+            <div class="card border-0 shadow-sm rounded-3 sticky-top" style="top:80px;z-index:100;">
                 <div class="card-body p-4">
                     <h6 class="fw-bold mb-3">
                         <i class="bi bi-funnel me-2"></i>Filtros

@@ -269,7 +269,7 @@
         <div class="col-lg-4">
 
             {{-- Card de contacto --}}
-            <div class="card border-0 shadow-sm rounded-3 mb-4 sticky-top" style="top:80px;">
+            <div class="card border-0 shadow-sm rounded-3 mb-4 sticky-top" style="top:80px;z-index:100;">
                 <div class="card-body p-4">
                     <h6 class="fw-bold mb-3">Contactar o hotel</h6>
 
