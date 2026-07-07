@@ -158,6 +158,10 @@
                class="nav-link {{ request()->routeIs('manager.quartos*') ? 'active' : '' }}">
                 <i class="bi bi-door-open me-2"></i>Quartos
             </a>
+            <a href="{{ route('manager.reviews.index') }}"
+   class="nav-link {{ request()->routeIs('manager.reviews*') ? 'active' : '' }}">
+    <i class="bi bi-star me-2"></i>Avaliações
+</a>
         @endif
 
         <div class="nav-section">Conta</div>
