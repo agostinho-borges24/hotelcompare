@@ -65,6 +65,11 @@ Route::middleware(['auth', 'verified', 'role:hotel_manager'])
 
         // Disponibilidade em tempo real
         Route::patch('/quartos/{room}/disponibilidade', [ManagerRoomController::class, 'toggleAvailability'])->name('rooms.availability');
+
+        // Avaliações — resposta do gestor
+        Route::get('/avaliacoes', [\App\Http\Controllers\Manager\ReviewController::class, 'index'])->name('reviews.index');
+        Route::post('/avaliacoes/{review}/responder', [\App\Http\Controllers\Manager\ReviewController::class, 'reply'])->name('reviews.reply');
+        Route::delete('/avaliacoes/{review}/resposta', [\App\Http\Controllers\Manager\ReviewController::class, 'deleteReply'])->name('reviews.reply.delete');
     });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -75,6 +80,11 @@ Route::middleware(['auth', 'verified', 'role:admin'])
     ->name('admin.')
     ->group(function () {
         Route::get('/dashboard',          [AdminDashboard::class, 'index'])->name('dashboard');
+
+        // Perfil do admin
+        Route::get('/perfil',             [\App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');
+        Route::put('/perfil',             [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
+        Route::put('/perfil/password',    [\App\Http\Controllers\Admin\ProfileController::class, 'updatePassword'])->name('profile.password');
 
         // Gestão de hotéis
         Route::resource('hoteis', AdminHotelController::class)->parameters(['hoteis' => 'hotel']);
