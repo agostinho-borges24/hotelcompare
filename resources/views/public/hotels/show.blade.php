@@ -193,6 +193,20 @@
                                 @if($review->comment)
                                     <p class="small text-muted mb-0">{{ $review->comment }}</p>
                                 @endif
+
+                                {{-- Resposta do gestor --}}
+                                @if($review->hasManagerReply())
+                                    <div class="mt-3 p-3 rounded-3 border-start border-primary border-3"
+                                         style="background:#f0f7ff;">
+                                        <div class="small fw-semibold text-primary mb-1">
+                                            <i class="bi bi-building me-1"></i>Resposta do hotel
+                                            <span class="text-muted fw-normal ms-2">
+                                                {{ $review->manager_replied_at->format('d/m/Y') }}
+                                            </span>
+                                        </div>
+                                        <p class="small mb-0 text-dark">{{ $review->manager_reply }}</p>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     @empty
