@@ -141,6 +141,11 @@
                class="nav-link {{ request()->routeIs('admin.reviews*') ? 'active' : '' }}">
                 <i class="bi bi-star me-2"></i>Avaliações
             </a>
+            <div class="nav-section">Conta</div>
+<a href="{{ route('admin.profile.edit') }}"
+   class="nav-link {{ request()->routeIs('admin.profile*') ? 'active' : '' }}">
+    <i class="bi bi-person-gear me-2"></i>O Meu Perfil
+</a>
         @else
             {{-- Menu Gestor --}}
             <div class="nav-section">Principal</div>
