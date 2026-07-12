@@ -29,7 +29,6 @@ class HotelController extends Controller
 
     public function create()
     {
-        // Apenas gestores sem hotel associado
         $managers  = User::where('role', 'hotel_manager')
             ->where('is_active', true)
             ->whereDoesntHave('hotels')
@@ -43,7 +42,6 @@ class HotelController extends Controller
     {
         $validated = $this->validateHotel($request);
 
-        // Verifica se o gestor já tem um hotel
         $manager = User::findOrFail($validated['user_id']);
         if ($manager->hotels()->exists()) {
             return back()
@@ -76,7 +74,6 @@ class HotelController extends Controller
 
     public function edit(Hotel $hotel)
     {
-        // Gestores sem hotel + o gestor actual do hotel
         $managers = User::where('role', 'hotel_manager')
             ->where('is_active', true)
             ->where(function ($q) use ($hotel) {
@@ -94,7 +91,6 @@ class HotelController extends Controller
     {
         $validated = $this->validateHotel($request, $hotel->id);
 
-        // Verifica se o novo gestor já tem outro hotel
         if ($validated['user_id'] != $hotel->user_id) {
             $manager = User::findOrFail($validated['user_id']);
             if ($manager->hotels()->exists()) {
@@ -146,21 +142,23 @@ class HotelController extends Controller
     private function validateHotel(Request $request, ?int $ignoreId = null): array
     {
         return $request->validate([
-            'user_id'        => 'required|exists:users,id',
-            'name'           => 'required|string|max:150',
-            'description'    => 'nullable|string|max:3000',
-            'address'        => 'required|string|max:255',
-            'neighborhood'   => 'nullable|string|max:100',
-            'phone'          => 'nullable|string|max:20',
-            'email'          => 'nullable|email|max:150',
-            'website'        => 'nullable|url|max:255',
-            'stars'          => 'required|integer|min:1|max:5',
-            'price_per_night'=> 'required|numeric|min:0',
-            'status'         => 'required|in:pending,active,suspended',
-            'is_featured'    => 'boolean',
-            'cover_image'    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072',
-            'amenities'      => 'nullable|array',
-            'amenities.*'    => 'exists:amenities,id',
+            'user_id'         => 'required|exists:users,id',
+            'name'            => 'required|string|max:150',
+            'description'     => 'nullable|string|max:3000',
+            'address'         => 'required|string|max:255',
+            'neighborhood'    => 'nullable|string|max:100',
+            'phone'           => 'nullable|string|max:20',
+            'email'           => 'nullable|email|max:150',
+            'website'         => 'nullable|url|max:255',
+            'stars'           => 'required|integer|min:1|max:5',
+            'price_per_night' => 'required|numeric|min:0',
+            'status'          => 'required|in:pending,active,suspended',
+            'is_featured'     => 'boolean',
+            'latitude'        => 'nullable|numeric|between:-90,90',
+            'longitude'       => 'nullable|numeric|between:-180,180',
+            'cover_image'     => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072',
+            'amenities'       => 'nullable|array',
+            'amenities.*'     => 'exists:amenities,id',
         ]);
     }
 }
