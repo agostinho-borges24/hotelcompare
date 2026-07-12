@@ -53,6 +53,7 @@
                             <label class="form-label small fw-semibold">Bairro / Zona</label>
                             <input type="text" name="neighborhood" class="form-control" value="{{ old('neighborhood', $hotel->neighborhood) }}">
                         </div>
+                        @include('partials.map-picker')
                         <div class="col-md-3">
                             <label class="form-label small fw-semibold">Preço/noite (Kz) *</label>
                             <input type="number" name="price_per_night" class="form-control"
@@ -134,5 +135,39 @@
         </form>
     </div>
 </div>
+
+@push('styles')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+@endpush
+
+@push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    const lat = parseFloat(document.getElementById('latInput').value) || -12.5700;
+    const lng = parseFloat(document.getElementById('lngInput').value) || 13.4000;
+
+    const map = L.map('hotelMapPicker').setView([lat, lng], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    let marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+
+    // Clique no mapa move o marcador
+    map.on('click', (e) => {
+        marker.setLatLng(e.latlng);
+        document.getElementById('latInput').value = e.latlng.lat.toFixed(7);
+        document.getElementById('lngInput').value = e.latlng.lng.toFixed(7);
+    });
+
+    // Arrastar o marcador actualiza os inputs
+    marker.on('dragend', (e) => {
+        const pos = e.target.getLatLng();
+        document.getElementById('latInput').value = pos.lat.toFixed(7);
+        document.getElementById('lngInput').value = pos.lng.toFixed(7);
+    });
+</script>
+@endpush
 
 @endsection
