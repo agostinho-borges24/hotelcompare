@@ -33,17 +33,19 @@ class HotelController extends Controller
         $hotel = $this->getHotel();
 
         $validated = $request->validate([
-            'name'           => 'required|string|max:150',
-            'description'    => 'nullable|string|max:3000',
-            'address'        => 'required|string|max:255',
-            'neighborhood'   => 'nullable|string|max:100',
-            'phone'          => 'nullable|string|max:20',
-            'email'          => 'nullable|email|max:150',
-            'website'        => 'nullable|url|max:255',
-            'stars'          => 'required|integer|min:1|max:5',
-            'price_per_night'=> 'required|numeric|min:0',
-            'amenities'      => 'nullable|array',
-            'amenities.*'    => 'exists:amenities,id',
+            'name'            => 'required|string|max:150',
+            'description'     => 'nullable|string|max:3000',
+            'address'         => 'required|string|max:255',
+            'neighborhood'    => 'nullable|string|max:100',
+            'phone'           => 'nullable|string|max:20',
+            'email'           => 'nullable|email|max:150',
+            'website'         => 'nullable|url|max:255',
+            'stars'           => 'required|integer|min:1|max:5',
+            'price_per_night' => 'required|numeric|min:0',
+            'latitude'        => 'nullable|numeric|between:-90,90',
+            'longitude'       => 'nullable|numeric|between:-180,180',
+            'amenities'       => 'nullable|array',
+            'amenities.*'     => 'exists:amenities,id',
         ]);
 
         $amenityIds = $validated['amenities'] ?? [];
@@ -62,7 +64,7 @@ class HotelController extends Controller
 
         $request->validate([
             'images'   => 'required|array|max:10',
-            'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:3072', // 3MB
+            'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:3072',
         ]);
 
         foreach ($request->file('images') as $file) {
