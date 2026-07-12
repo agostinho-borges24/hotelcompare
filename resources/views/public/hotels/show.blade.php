@@ -110,6 +110,8 @@
                 </div>
             @endif
 
+            @include('partials.map-show')
+
             {{-- Quartos com disponibilidade em tempo real --}}
             @if($hotel->rooms->isNotEmpty())
                 <div class="card border-0 shadow-sm rounded-3 mb-4">
