@@ -250,7 +250,10 @@
                         {{-- Simulação visual da tabela de comparação --}}
                         <div class="d-flex gap-2 mb-3">
                             <div class="flex-fill text-center">
-                                <div class="rounded-3 mb-2 overflow-hidden" style="height:80px;background:#e2e8f0;"></div>
+                                <div class="rounded-3 mb-2 overflow-hidden" style="height:80px;">
+    <img src="{{ asset('images/hotel-placeholder.jpg') }}"
+         class="w-100 h-100 object-fit-cover" alt="">
+</div>
                                 <div class="fw-semibold small">Hotel A</div>
                                 <div class="text-warning small">★★★★★</div>
                             </div>
@@ -258,7 +261,10 @@
                                 <i class="bi bi-arrow-left-right text-primary fs-4"></i>
                             </div>
                             <div class="flex-fill text-center">
-                                <div class="rounded-3 mb-2 overflow-hidden" style="height:80px;background:#e2e8f0;"></div>
+                                <div class="rounded-3 mb-2 overflow-hidden" style="height:80px;">
+    <img src="{{ asset('images/hotel-placeholder.jpg') }}"
+         class="w-100 h-100 object-fit-cover" alt="">
+</div>
                                 <div class="fw-semibold small">Hotel B</div>
                                 <div class="text-warning small">★★★★</div>
                             </div>
@@ -266,7 +272,10 @@
                                 <i class="bi bi-arrow-left-right text-primary fs-4"></i>
                             </div>
                             <div class="flex-fill text-center">
-                                <div class="rounded-3 mb-2 overflow-hidden" style="height:80px;background:#e2e8f0;"></div>
+                                <div class="rounded-3 mb-2 overflow-hidden" style="height:80px;">
+    <img src="{{ asset('images/hotel-placeholder.jpg') }}"
+         class="w-100 h-100 object-fit-cover" alt="">
+</div>
                                 <div class="fw-semibold small">Hotel C</div>
                                 <div class="text-warning small">★★★</div>
                             </div>
